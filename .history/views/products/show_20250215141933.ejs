@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details</title>
+</head>
+<body>
+    <h1><%= product.name %></h1>
+    
+    <img src="/<%= product.image %>" alt="<%= product.name %>" style="max-width: 300px;">
+    
+    <div>
+        <p><strong>Brand:</strong> <%= product.brand %></p>
+        <p><strong>Warna:</strong> <%= product.color %></p>
+        <p><strong>Harga:</strong> Rp. <%= product.price %></p>
+        <p><strong>Category:</strong> <%= product.category %></p>
+        <p><strong>Ditambahkan pada:</strong> <%= product.createdAt.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) %></p>
+        <p><strong>Diperbarui pada:</strong> <%= product.updatedAt.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) %></p>
+    </div>
+
+    <div>
+            <button type="submit">Delete</button>
+        </form>
+        <a href="/products">All Products</a>
+    </div>
+</body>
+</html>

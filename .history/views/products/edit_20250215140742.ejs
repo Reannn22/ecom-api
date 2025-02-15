@@ -4,12 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Product</title>
-    <style>
-        .current-image {
-            max-width: 200px;
-            margin: 10px 0;
-        }
-    </style>
 </head>
 <body>
     <h1>Edit Product</h1>
@@ -40,26 +34,14 @@
             </select>
         </div>
         <div>
-            <label for="current-image">Current Image:</label><br>
-            <img src="/<%= product.image %>" alt="<%= product.name %>" class="current-image">
+            <label for="image">Current Image:</label>
+            <img src="/<%= product.image %>" alt="<%= product.name %>" style="max-width: 200px;">
         </div>
         <div>
             <label for="image">Upload New Image:</label>
             <input type="file" name="image" id="image">
-            <p><small>Leave empty to keep current image</small></p>
         </div>
-        <div style="margin-top: 20px;">
-            <button type="submit">Update Product</button>
-            <a href="/products/<%= product._id %>">Cancel</a>
-        </div>
+        <button type="submit">Submit</button>
     </form>
-
-    <div style="margin-top: 20px; border-top: 1px solid #ccc; padding-top: 20px;">
-        <h3>Delete Product</h3>
-        <form action="/products/<%= product._id %>?_method=DELETE" method="POST" 
-              onsubmit="return confirm('Are you sure you want to delete this product?');">
-            <button type="submit" style="background-color: #ff4444; color: white;">Delete Product</button>
-        </form>
-    </div>
 </body>
 </html>

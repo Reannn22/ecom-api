@@ -2,18 +2,11 @@ const path = require('path');
 const express = require('express')
 const methodOverride = require('method-override')
 const mongoose = require('mongoose')
-const multer = require('multer')
-const fs = require('fs')
 const app = express()
 const ErrorHandler = require('./ErrorHandler')
 
 /* Models */
 const Product = require('./models/product')
-
-// create uploads directory if it doesn't exist
-if (!fs.existsSync('uploads')) {
-    fs.mkdirSync('uploads');
-}
 
 // connect to mongodb
 mongoose.connect('mongodb://127.0.0.1/shop_db')
@@ -27,24 +20,6 @@ app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
 app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
-
-// Multer configuration
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        // Ensure the uploads directory exists
-        if (!fs.existsSync('uploads')) {
-            fs.mkdirSync('uploads');
-        }
-        cb(null, 'uploads/')
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname)
-    }
-})
-const upload = multer({ storage: storage })
-
-// Serve static files from uploads directory
-app.use('/uploads', express.static('uploads'))
 
 function wrapAsync(fn) {
     return function (req, res, next) {
@@ -71,11 +46,8 @@ app.get('/products/create', (req, res) => {
     res.render('products/create')
 })
 
-app.post('/products', upload.single('image'), wrapAsync(async (req, res) => {
-    const product = new Product({
-        ...req.body,
-        image: req.file.path
-    })
+app.post('/products', wrapAsync(async (req, res) => {
+    const product = new Product(req.body)
     await product.save()
     res.redirect(`/products/${product._id}`)
 }))
@@ -92,31 +64,11 @@ app.get('/products/:id/edit', wrapAsync(async (req, res) => {
     res.render('products/edit', { product })
 }))
 
-// Update PUT route to handle image upload
-app.put('/products/:id', upload.single('image'), wrapAsync(async (req, res) => {
+app.put('/products/:id', wrapAsync(async (req, res) => {
     const { id } = req.params
-    const product = await Product.findById(id);
-    
-    if (req.file) {
-        // Delete old image if exists
-        if (product.image && fs.existsSync(product.image)) {
-            fs.unlinkSync(product.image);
-        }
-        // Update with new image
-        const updatedProduct = await Product.findByIdAndUpdate(id, {
-            ...req.body,
-            image: req.file.path
-        }, { runValidators: true, new: true });
-        res.redirect(`/products/${updatedProduct._id}`);
-    } else {
-        // Keep existing image if no new image uploaded
-        const updatedProduct = await Product.findByIdAndUpdate(id, {
-            ...req.body,
-            image: product.image // keep existing image path
-        }, { runValidators: true, new: true });
-        res.redirect(`/products/${updatedProduct._id}`);
-    }
-}));
+    const product = await Product.findByIdAndUpdate(id, req.body, { runValidators: true })
+    res.redirect(`/products/${product._id}`)
+}))
 
 app.delete('/products/:id', wrapAsync(async (req, res) => {
     const { id } = req.params

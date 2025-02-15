@@ -48,18 +48,3 @@
             <input type="file" name="image" id="image">
             <p><small>Leave empty to keep current image</small></p>
         </div>
-        <div style="margin-top: 20px;">
-            <button type="submit">Update Product</button>
-            <a href="/products/<%= product._id %>">Cancel</a>
-        </div>
-    </form>
-
-    <div style="margin-top: 20px; border-top: 1px solid #ccc; padding-top: 20px;">
-        <h3>Delete Product</h3>
-        <form action="/products/<%= product._id %>?_method=DELETE" method="POST" 
-              onsubmit="return confirm('Are you sure you want to delete this product?');">
-            <button type="submit" style="background-color: #ff4444; color: white;">Delete Product</button>
-        </form>
-    </div>
-</body>
-</html>

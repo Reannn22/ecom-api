@@ -97,8 +97,9 @@ app.put('/products/:id', upload.single('image'), wrapAsync(async (req, res) => {
     const { id } = req.params
     const product = await Product.findById(id);
     
+    // If there's a new image uploaded
     if (req.file) {
-        // Delete old image if exists
+        // Delete old image if it exists
         if (product.image && fs.existsSync(product.image)) {
             fs.unlinkSync(product.image);
         }
@@ -109,11 +110,9 @@ app.put('/products/:id', upload.single('image'), wrapAsync(async (req, res) => {
         }, { runValidators: true, new: true });
         res.redirect(`/products/${updatedProduct._id}`);
     } else {
-        // Keep existing image if no new image uploaded
-        const updatedProduct = await Product.findByIdAndUpdate(id, {
-            ...req.body,
-            image: product.image // keep existing image path
-        }, { runValidators: true, new: true });
+        // If no new image, just update other fields
+        const updatedProduct = await Product.findByIdAndUpdate(id, req.body, 
+            { runValidators: true, new: true });
         res.redirect(`/products/${updatedProduct._id}`);
     }
 }));

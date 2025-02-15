@@ -20,12 +20,8 @@ const productSchema = new mongoose.Schema({
     category: {
         type: String,
         enum: ['Baju', 'Celana', 'Aksesoris', 'Jaket'],
-    },
-    image: {
-        type: String,
-        required: true
     }
-}, { timestamps: true })
+})
 
 const Product = mongoose.model('Product', productSchema)
 

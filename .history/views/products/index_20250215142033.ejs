@@ -20,22 +20,18 @@
 </head>
 <body>
     <h1><%= category %> Products</h1>
-    <a href="/products/create">Add Product</a>
-    <% if(category !== 'All') { %>
-        <a href="/products">All Products</a>
-    <% } %>
-    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
-        <% for(let product of products) { %>
+    <% for(let product of products) { %>
         <div class="product-card">
             <img src="/<%= product.image %>" alt="<%= product.name %>" class="product-image">
-            <h3><%= product.name %> - <%= product.brand %></h3>
+            <h2><%= product.name %></h2>
+            <p>Brand: <%= product.brand %></p>
             <p>Price: <%= product.price %></p>
-            <div style="display: flex; gap: 10px;">
+            <p>Ditambahkan: <%= product.createdAt.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }) %></p>
+            <div>
                 <a href="/products/<%= product._id %>">View</a>
                 <a href="/products/<%= product._id %>/edit">Edit</a>
             </div>
         </div>
-        <% } %>
-    </div>
+    <% } %>
 </body>
 </html>

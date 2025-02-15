@@ -92,31 +92,11 @@ app.get('/products/:id/edit', wrapAsync(async (req, res) => {
     res.render('products/edit', { product })
 }))
 
-// Update PUT route to handle image upload
-app.put('/products/:id', upload.single('image'), wrapAsync(async (req, res) => {
+app.put('/products/:id', wrapAsync(async (req, res) => {
     const { id } = req.params
-    const product = await Product.findById(id);
-    
-    if (req.file) {
-        // Delete old image if exists
-        if (product.image && fs.existsSync(product.image)) {
-            fs.unlinkSync(product.image);
-        }
-        // Update with new image
-        const updatedProduct = await Product.findByIdAndUpdate(id, {
-            ...req.body,
-            image: req.file.path
-        }, { runValidators: true, new: true });
-        res.redirect(`/products/${updatedProduct._id}`);
-    } else {
-        // Keep existing image if no new image uploaded
-        const updatedProduct = await Product.findByIdAndUpdate(id, {
-            ...req.body,
-            image: product.image // keep existing image path
-        }, { runValidators: true, new: true });
-        res.redirect(`/products/${updatedProduct._id}`);
-    }
-}));
+    const product = await Product.findByIdAndUpdate(id, req.body, { runValidators: true })
+    res.redirect(`/products/${product._id}`)
+}))
 
 app.delete('/products/:id', wrapAsync(async (req, res) => {
     const { id } = req.params
@@ -132,16 +112,6 @@ const validatorHandler = err => {
 
 app.use((err, req, res, next) => {
     console.dir(err)
-    if (err.name === 'ValidationError') err = validatorHandler(err)
-    if (err.name === 'CastError') {
-        err.status = 404
-        err.message = 'Product not found'
-    }
-    next(err)
-})
-
-app.use((err, req, res, next) => {
-    const { status = 500, message = 'Something went wrong' } = err
     res.status(status).send(message);
 })
 

@@ -117,7 +117,6 @@ app.put('/products/:id', upload.single('image'), wrapAsync(async (req, res) => {
         res.redirect(`/products/${updatedProduct._id}`);
     }
 }));
-
 app.delete('/products/:id', wrapAsync(async (req, res) => {
     const { id } = req.params
     await Product.findByIdAndDelete(id)

@@ -24,18 +24,10 @@
     <% if(category !== 'All') { %>
         <a href="/products">All Products</a>
     <% } %>
-    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
-        <% for(let product of products) { %>
-        <div class="product-card">
-            <img src="/<%= product.image %>" alt="<%= product.name %>" class="product-image">
-            <h3><%= product.name %> - <%= product.brand %></h3>
-            <p>Price: <%= product.price %></p>
-            <div style="display: flex; gap: 10px;">
-                <a href="/products/<%= product._id %>">View</a>
-                <a href="/products/<%= product._id %>/edit">Edit</a>
-            </div>
-        </div>
-        <% } %>
-    </div>
-</body>
-</html>
+    <ul>
+        <% for( let product of products) { %>
+        <li class="product-card">
+            <a href="/products/<%= product._id %>">
+                <img src="<%= product.image %>" alt="<%= product.name %>" class="product-image">
+                <%= product.name  %> - <%= product.brand %>
+            </a>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product</title>
+</head>
+<body>
+    <h1>Edit Product</h1>
+    <form action="/products/<%= product._id %>?_method=PUT" method="POST" enctype="multipart/form-data">
+        <div>
+            <label for="name">Nama Produk:</label>
+            <input type="text" name="name" id="name" value="<%= product.name %>">
+        </div>
+        <div>
+            <label for="brand">Brand:</label>
+            <input type="text" name="brand" id="brand" value="<%= product.brand %>">
+        </div>
+        <div>
+            <label for="color">Warna:</label>
+            <input type="text" name="color" id="color" value="<%= product.color %>">
+        </div>
+        <div>
+            <label for="price">Harga:</label>
+            <input type="number" name="price" id="price" value="<%= product.price %>">
+        </div>
+        <div>
+            <label for="category">Kategori:</label>
+            <select name="category" id="category">
+                <option value="Aksesoris" <%= product.category === 'Aksesoris' ? 'selected' : '' %>>Aksesoris</option>
+                <option value="Baju" <%= product.category === 'Baju' ? 'selected' : '' %>>Baju</option>

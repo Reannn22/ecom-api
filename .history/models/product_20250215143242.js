@@ -20,10 +20,6 @@ const productSchema = new mongoose.Schema({
     category: {
         type: String,
         enum: ['Baju', 'Celana', 'Aksesoris', 'Jaket'],
-    },
-    image: {
-        type: String,
-        required: true
     }
 }, { timestamps: true })
 
