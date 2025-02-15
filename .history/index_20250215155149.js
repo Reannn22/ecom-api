@@ -115,24 +115,6 @@ app.post('/register/:role', wrapAsync(async (req, res) => {
         }
         const { username, email, password } = req.body;
         const user = new User({ username, email, password, role });
-        await user.save();
-        req.session.user_id = user._id;
-        res.redirect('/products');
-    } catch (e) {
-        res.render('users/register', { 
-            error: 'Username atau email sudah terdaftar',
-            currentUser: res.locals.currentUser,
-            role: req.params.role
-        });
-    }
-}));
-
-// Update login routes
-app.get('/login', (req, res) => {
-    res.render('users/login-choice', { error: null, currentUser: res.locals.currentUser });
-});
-
-app.get('/login/:role', (req, res) => {
     const { role } = req.params;
     res.render('users/login', { 
         error: null, 

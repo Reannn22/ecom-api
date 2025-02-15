@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products</title>
+    <style>
+        .product-card {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px;
+            max-width: 300px;
+        }
+        .product-image {
+            max-width: 200px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/navbar') %>
+    <h1><%= category %> Products</h1>
+    <a href="/products/create">Add Product</a>
+    <% if(category !== 'All') { %>
+        <a href="/products">All Products</a>
+    <% } %>
+    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+        <% for(let product of products) { %>
+        <div class="product-card">
+            <img src="/<%= product.image %>" alt="<%= product.name %>" class="product-image">
+            <h3><%= product.name %> - <%= product.brand %></h3>
+            <p>Price: <%= product.price %></p>
+            <p style="font-size: 0.8em; color: #666;">
+                Ditambahkan: <%= product.createdAt ? product.createdAt.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Tanggal tidak tersedia' %>
+            </p>
+            <p style="font-size: 0.8em; color: #666;">
+                Diupdate pada: <%= product.updatedAt ? product.updatedAt.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Tanggal tidak tersedia' %>
+            </p>
+            <div style="display: flex; gap: 10px;">
+                <a href="/products/<%= product._id %>">View</a>
+                <a href="/products/<%= product._id %>/edit">Edit</a>
+            </div>
+        </div>
+        <% } %>
+    </div>
+</body>
+</html>

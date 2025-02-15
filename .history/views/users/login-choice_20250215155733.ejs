@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Login Type</title>
+    <style>
+        .login-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 50px;
+        }
+        .login-card {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            width: 200px;
+        }
+        .login-button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 10px;
+            text-decoration: none;
+            background-color: #333;
+            color: white;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../partials/navbar') %>
+    <h1 style="text-align: center;">Choose Login Type</h1>
+    <div class="login-container">
+        <div class="login-card">
+            <h2>User Login</h2>
+            <p>Login as regular user</p>
+            <a href="/login/user" class="login-button">Login as User</a>
+        </div>
+        <div class="login-card">
+            <h2>Admin Login</h2>
+            <p>Login as administrator</p>
+            <a href="/login/admin" class="login-button">Login as Admin</a>
+        </div>
+    </div>
+</body>
+</html>

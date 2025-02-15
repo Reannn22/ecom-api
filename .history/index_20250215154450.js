@@ -90,30 +90,13 @@ app.use(async (req, res, next) => {
     next();
 });
 
-// Update register routes
 app.get('/register', (req, res) => {
-    res.render('users/register-choice', { error: null, currentUser: res.locals.currentUser });
+    res.render('users/register', { error: null, currentUser: res.locals.currentUser });
 });
 
-app.get('/register/:role', (req, res) => {
-    const { role } = req.params;
-    if (!['user', 'admin'].includes(role)) {
-        return res.redirect('/register');
-    }
-    res.render('users/register', { 
-        error: null, 
-        currentUser: res.locals.currentUser,
-        role: role
-    });
-});
-
-app.post('/register/:role', wrapAsync(async (req, res) => {
+app.post('/register', wrapAsync(async (req, res) => {
     try {
-        const { role } = req.params;
-        if (!['user', 'admin'].includes(role)) {
-            return res.redirect('/register');
-        }
-        const { username, email, password } = req.body;
+        const { username, email, password, role } = req.body;
         const user = new User({ username, email, password, role });
         await user.save();
         req.session.user_id = user._id;
@@ -121,8 +104,7 @@ app.post('/register/:role', wrapAsync(async (req, res) => {
     } catch (e) {
         res.render('users/register', { 
             error: 'Username atau email sudah terdaftar',
-            currentUser: res.locals.currentUser,
-            role: req.params.role
+            currentUser: res.locals.currentUser 
         });
     }
 }));
@@ -154,26 +136,6 @@ app.post('/login/:role', wrapAsync(async (req, res) => {
                 role: role
             });
         }
-        req.session.user_id = user._id;
-        res.redirect('/products');
-    } else {
-        res.render('users/login', { 
-            error: 'Invalid email or password',
-            currentUser: res.locals.currentUser,
-            role: role
-        });
-    }
-}));
-
-app.post('/logout', (req, res) => {
-    req.session.destroy();
-    res.redirect('/login');
-});
-
-app.get('/products', async (req, res) => {
-    const { category } = req.query
-    if (category) {
-        const products = await Product.find({ category })
         res.render('products/index', { products, category })
     } else {
         const products = await Product.find({})
