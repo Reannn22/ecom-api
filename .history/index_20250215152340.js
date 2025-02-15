@@ -84,14 +84,8 @@ app.get('/', (req, res) => {
     res.send('Hello World')
 })
 
-// Pindahkan middleware currentUser ke ATAS sebelum semua routes
-app.use(async (req, res, next) => {
-    res.locals.currentUser = req.session.user_id ? await User.findById(req.session.user_id) : null;
-    next();
-});
-
 app.get('/register', (req, res) => {
-    res.render('users/register', { error: null, currentUser: res.locals.currentUser });
+    res.render('users/register', { error: null });
 });
 
 app.post('/register', wrapAsync(async (req, res) => {
@@ -102,15 +96,12 @@ app.post('/register', wrapAsync(async (req, res) => {
         req.session.user_id = user._id;
         res.redirect('/products');
     } catch (e) {
-        res.render('users/register', { 
-            error: 'Username atau email sudah terdaftar',
-            currentUser: res.locals.currentUser 
-        });
+        res.render('users/register', { error: 'Username atau email sudah terdaftar' });
     }
 }));
 
 app.get('/login', (req, res) => {
-    res.render('users/login', { error: null, currentUser: res.locals.currentUser });
+    res.render('users/login', { error: null });
 });
 
 app.post('/login', wrapAsync(async (req, res) => {
@@ -120,16 +111,23 @@ app.post('/login', wrapAsync(async (req, res) => {
         req.session.user_id = user._id;
         res.redirect('/products');
     } else {
-        res.render('users/login', { 
-            error: 'Email atau password salah',
-            currentUser: res.locals.currentUser 
-        });
+        res.render('users/login', { error: 'Email atau password salah' });
     }
 }));
 
 app.post('/logout', (req, res) => {
     req.session.destroy();
     res.redirect('/login');
+});
+
+// Middleware untuk menyediakan data user ke semua views
+app.use(async (req, res, next) => {
+    if (req.session.user_id) {
+        res.locals.currentUser = await User.findById(req.session.user_id);
+    } else {
+        res.locals.currentUser = null;
+    }
+    next();
 });
 
 app.get('/products', async (req, res) => {

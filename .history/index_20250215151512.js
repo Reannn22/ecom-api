@@ -84,46 +84,30 @@ app.get('/', (req, res) => {
     res.send('Hello World')
 })
 
-// Pindahkan middleware currentUser ke ATAS sebelum semua routes
-app.use(async (req, res, next) => {
-    res.locals.currentUser = req.session.user_id ? await User.findById(req.session.user_id) : null;
-    next();
-});
-
 app.get('/register', (req, res) => {
-    res.render('users/register', { error: null, currentUser: res.locals.currentUser });
+    res.render('auth/register');
 });
 
 app.post('/register', wrapAsync(async (req, res) => {
-    try {
-        const { username, email, password, role } = req.body;
-        const user = new User({ username, email, password, role });
-        await user.save();
-        req.session.user_id = user._id;
-        res.redirect('/products');
-    } catch (e) {
-        res.render('users/register', { 
-            error: 'Username atau email sudah terdaftar',
-            currentUser: res.locals.currentUser 
-        });
-    }
+    const { username, password, role } = req.body;
+    const user = new User({ username, password, role });
+    await user.save();
+    req.session.user_id = user._id;
+    res.redirect('/');
 }));
 
 app.get('/login', (req, res) => {
-    res.render('users/login', { error: null, currentUser: res.locals.currentUser });
+    res.render('auth/login');
 });
 
 app.post('/login', wrapAsync(async (req, res) => {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (user && await user.verifyPassword(password)) {
+    const { username, password } = req.body;
+    const user = await User.findAndValidate(username, password);
+    if (user) {
         req.session.user_id = user._id;
-        res.redirect('/products');
+        res.redirect('/');
     } else {
-        res.render('users/login', { 
-            error: 'Email atau password salah',
-            currentUser: res.locals.currentUser 
-        });
+        res.redirect('/login');
     }
 }));
 
@@ -143,7 +127,6 @@ app.get('/products', async (req, res) => {
     }
 })
 
-app.use('/products/create', requireLogin);
 app.get('/products/create', requireLogin, (req, res) => {
     res.render('products/create')
 })
@@ -163,7 +146,6 @@ app.get('/products/:id', wrapAsync(async (req, res) => {
     res.render('products/show', { product })
 }))
 
-app.use('/products/:id/edit', requireLogin);
 app.get('/products/:id/edit', requireLogin, wrapAsync(async (req, res) => {
     const { id } = req.params
     const product = await Product.findById(id)
@@ -220,10 +202,3 @@ app.use((err, req, res, next) => {
 
 app.use((err, req, res, next) => {
     const { status = 500, message = 'Something went wrong' } = err
-    res.status(status).send(message);
-})
-
-
-app.listen(3000, () => {
-    console.log('shop app listening on http://127.0.0.1:3000')
-})

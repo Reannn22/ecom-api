@@ -1,0 +1,24 @@
+<nav style="background-color: #333; padding: 1rem; margin-bottom: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <a href="/products" style="color: white; text-decoration: none; margin-right: 1rem;">Products</a>
+            <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+                <a href="/products/create" style="color: white; text-decoration: none;">Add Product</a>
+            <% } %>
+        </div>
+        <div>
+            <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+                <span style="color: white; margin-right: 1rem;">
+                    Welcome, <%= currentUser.username %> 
+                    (<%= currentUser.role %>)
+                </span>
+                <form action="/logout" method="POST" style="display: inline;">
+                    <button type="submit" style="background: none; border: 1px solid white; color: white; padding: 0.3rem 0.7rem; cursor: pointer;">Logout</button>
+                </form>
+            <% } else { %>
+                <a href="/login" style="color: white; text-decoration: none; margin-right: 1rem;">Login</a>
+                <a href="/register" style="color: white; text-decoration: none;">Register</a>
+            <% } %>
+        </div>
+    </div>
+</nav>

@@ -112,24 +112,18 @@ app.post('/register', wrapAsync(async (req, res) => {
 app.get('/login', (req, res) => {
     res.render('users/login', { error: null, currentUser: res.locals.currentUser });
 });
-
-app.post('/login', wrapAsync(async (req, res) => {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (user && await user.verifyPassword(password)) {
-        req.session.user_id = user._id;
-        res.redirect('/products');
-    } else {
-        res.render('users/login', { 
-            error: 'Email atau password salah',
-            currentUser: res.locals.currentUser 
-        });
     }
 }));
 
 app.post('/logout', (req, res) => {
     req.session.destroy();
     res.redirect('/login');
+});
+
+// Middleware untuk menyediakan data user ke semua views - pastikan ini ada sebelum routes
+app.use(async (req, res, next) => {
+    res.locals.currentUser = req.session.user_id ? await User.findById(req.session.user_id) : null;
+    next();
 });
 
 app.get('/products', async (req, res) => {

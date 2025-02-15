@@ -4,8 +4,6 @@ const methodOverride = require('method-override')
 const mongoose = require('mongoose')
 const multer = require('multer')
 const fs = require('fs')
-const session = require('express-session');
-const User = require('./models/user');
 const app = express()
 const ErrorHandler = require('./ErrorHandler')
 
@@ -48,32 +46,6 @@ const upload = multer({ storage: storage })
 // Serve static files from uploads directory
 app.use('/uploads', express.static('uploads'))
 
-// Add session middleware after other middleware
-app.use(session({
-    secret: 'rahasia',
-    resave: false,
-    saveUninitialized: false
-}));
-
-// Add authentication middleware
-const requireLogin = (req, res, next) => {
-    if (!req.session.user_id) {
-        return res.redirect('/login');
-    }
-    next();
-};
-
-const requireAdmin = async (req, res, next) => {
-    if (!req.session.user_id) {
-        return res.redirect('/login');
-    }
-    const user = await User.findById(req.session.user_id);
-    if (user.role !== 'admin') {
-        return res.send('Not authorized');
-    }
-    next();
-};
-
 function wrapAsync(fn) {
     return function (req, res, next) {
         fn(req, res, next).catch(err => next(err))
@@ -83,54 +55,6 @@ function wrapAsync(fn) {
 app.get('/', (req, res) => {
     res.send('Hello World')
 })
-
-// Pindahkan middleware currentUser ke ATAS sebelum semua routes
-app.use(async (req, res, next) => {
-    res.locals.currentUser = req.session.user_id ? await User.findById(req.session.user_id) : null;
-    next();
-});
-
-app.get('/register', (req, res) => {
-    res.render('users/register', { error: null, currentUser: res.locals.currentUser });
-});
-
-app.post('/register', wrapAsync(async (req, res) => {
-    try {
-        const { username, email, password, role } = req.body;
-        const user = new User({ username, email, password, role });
-        await user.save();
-        req.session.user_id = user._id;
-        res.redirect('/products');
-    } catch (e) {
-        res.render('users/register', { 
-            error: 'Username atau email sudah terdaftar',
-            currentUser: res.locals.currentUser 
-        });
-    }
-}));
-
-app.get('/login', (req, res) => {
-    res.render('users/login', { error: null, currentUser: res.locals.currentUser });
-});
-
-app.post('/login', wrapAsync(async (req, res) => {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (user && await user.verifyPassword(password)) {
-        req.session.user_id = user._id;
-        res.redirect('/products');
-    } else {
-        res.render('users/login', { 
-            error: 'Email atau password salah',
-            currentUser: res.locals.currentUser 
-        });
-    }
-}));
-
-app.post('/logout', (req, res) => {
-    req.session.destroy();
-    res.redirect('/login');
-});
 
 app.get('/products', async (req, res) => {
     const { category } = req.query
@@ -143,12 +67,11 @@ app.get('/products', async (req, res) => {
     }
 })
 
-app.use('/products/create', requireLogin);
-app.get('/products/create', requireLogin, (req, res) => {
+app.get('/products/create', (req, res) => {
     res.render('products/create')
 })
 
-app.post('/products', requireLogin, upload.single('image'), wrapAsync(async (req, res) => {
+app.post('/products', upload.single('image'), wrapAsync(async (req, res) => {
     const product = new Product({
         ...req.body,
         image: req.file.path
@@ -163,15 +86,14 @@ app.get('/products/:id', wrapAsync(async (req, res) => {
     res.render('products/show', { product })
 }))
 
-app.use('/products/:id/edit', requireLogin);
-app.get('/products/:id/edit', requireLogin, wrapAsync(async (req, res) => {
+app.get('/products/:id/edit', wrapAsync(async (req, res) => {
     const { id } = req.params
     const product = await Product.findById(id)
     res.render('products/edit', { product })
 }))
 
 // Update PUT route to handle image upload
-app.put('/products/:id', requireLogin, upload.single('image'), wrapAsync(async (req, res) => {
+app.put('/products/:id', upload.single('image'), wrapAsync(async (req, res) => {
     const { id } = req.params
     const product = await Product.findById(id);
     
@@ -196,7 +118,7 @@ app.put('/products/:id', requireLogin, upload.single('image'), wrapAsync(async (
     }
 }));
 
-app.delete('/products/:id', requireLogin, wrapAsync(async (req, res) => {
+app.delete('/products/:id', wrapAsync(async (req, res) => {
     const { id } = req.params
     await Product.findByIdAndDelete(id)
     res.redirect('/products')

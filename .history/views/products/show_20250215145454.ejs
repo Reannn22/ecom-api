@@ -14,7 +14,6 @@
     </style>
 </head>
 <body>
-    <%- include('../partials/navbar') %>
     <h1><%= product.name %></h1>
     
     <img src="/<%= product.image %>" alt="<%= product.name %>" class="product-image">
@@ -31,8 +30,6 @@
         <li>Diupdate pada: <%= product.updatedAt.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) %></li>
     </ul>
     <a href="/products">All Products</a>
-    <a href="/products/<%= product._id %>/edit">Edit</a>
-    <form action="/products/<%= product._id %>?_method=DELETE" method="post">
         <button type="submit">Delete</button>
     </form>
 </body>
